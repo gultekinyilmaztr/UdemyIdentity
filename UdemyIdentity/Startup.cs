@@ -33,22 +33,6 @@ namespace UdemyIdentity
             {
                 opts.UseSqlServer(configuration["ConnectionStrings:DefaultConnectionStrings"]);
             });
-
-            CookieBuilder cookieBuilder = new CookieBuilder();
-
-            cookieBuilder.Name = "MyBlog";
-            cookieBuilder.HttpOnly = false;
-            cookieBuilder.Expiration = System.TimeSpan.FromDays(60);
-            cookieBuilder.SameSite = SameSiteMode.Lax;
-            cookieBuilder.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-
-            services.ConfigureApplicationCookie(opts =>
-            {
-                opts.LoginPath = new PathString("/Home/Login");
-                opts.Cookie = cookieBuilder;
-                opts.SlidingExpiration = true;
-            });
-
             services.AddIdentity<AppUser, IdentityRole>
                 (opts =>
                 {
@@ -67,6 +51,22 @@ namespace UdemyIdentity
                 ().AddErrorDescriber<CustomIdentityDescriber>
                 ().AddEntityFrameworkStores<AppIdentityDbContext>();
 
+            CookieBuilder cookieBuilder = new CookieBuilder();
+
+            cookieBuilder.Name = "MyBlog";
+            cookieBuilder.HttpOnly = false;           
+            cookieBuilder.SameSite = SameSiteMode.Lax;
+            cookieBuilder.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+
+            services.ConfigureApplicationCookie(opts =>
+            {
+                opts.LoginPath = new PathString("/Home/Login");
+                opts.Cookie = cookieBuilder;
+                opts.SlidingExpiration = true;
+                opts.ExpireTimeSpan = System.TimeSpan.FromDays(60);
+                
+            });
+
             services.AddMvc(option => option.EnableEndpointRouting = false);
         }
 
@@ -77,12 +77,11 @@ namespace UdemyIdentity
             app.UseDeveloperExceptionPage();
             app.UseStatusCodePages();
             app.UseStaticFiles();
-
-
-            app.UseMvcWithDefaultRoute();
             app.UseRouting();
             app.UseAuthentication();
-
+            app.UseMvcWithDefaultRoute();
+            
+           
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
