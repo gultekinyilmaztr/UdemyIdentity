@@ -2,7 +2,7 @@
 
 namespace UdemyIdentity.CustomValidator
 {
-    public class CustomIdentityDescriber : IdentityErrorDescriber
+    public class CustomIdentityErrorDescriber : IdentityErrorDescriber
     {
         public override IdentityError InvalidUserName(string userName)
         {

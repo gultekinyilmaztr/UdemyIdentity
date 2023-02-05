@@ -48,8 +48,9 @@ namespace UdemyIdentity
 
                 }).AddPasswordValidator<CustomPasswordValidator>
                 ().AddUserValidator<CustomUserValidator>
-                ().AddErrorDescriber<CustomIdentityDescriber>
-                ().AddEntityFrameworkStores<AppIdentityDbContext>();
+                ().AddErrorDescriber<CustomIdentityErrorDescriber>
+                ().AddEntityFrameworkStores<AppIdentityDbContext>
+                ().AddDefaultTokenProviders();
 
             CookieBuilder cookieBuilder = new CookieBuilder();
 
@@ -61,6 +62,7 @@ namespace UdemyIdentity
             services.ConfigureApplicationCookie(opts =>
             {
                 opts.LoginPath = new PathString("/Home/Login");
+                opts.LogoutPath = new PathString("/Member/LogOut");
                 opts.Cookie = cookieBuilder;
                 opts.SlidingExpiration = true;
                 opts.ExpireTimeSpan = System.TimeSpan.FromDays(60);
@@ -77,11 +79,10 @@ namespace UdemyIdentity
             app.UseDeveloperExceptionPage();
             app.UseStatusCodePages();
             app.UseStaticFiles();
+
             app.UseRouting();
             app.UseAuthentication();
-            app.UseMvcWithDefaultRoute();
-            
-           
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
